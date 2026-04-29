@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手写数字识别</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        
+        .upload-section {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+        
+        .upload-section:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .upload-section.dragover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .upload-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .upload-hint {
+            font-size: 14px;
+            color: #999;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .preview-section {
+            display: none;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .preview-section.show {
+            display: block;
+        }
+        
+        #previewImage {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .predict-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 30px;
+        }
+        
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .predict-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.show {
+            display: block;
+        }
+        
+        .result-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .prediction {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .prediction-number {
+            font-size: 80px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .prediction-confidence {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .probabilities {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        
+        .prob-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .prob-item:hover {
+            background: #e9ecef;
+        }
+        
+        .prob-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .prob-bar-container {
+            height: 8px;
+            background: #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .prob-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .prob-value {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .canvas-section {
+            display: none;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .canvas-section.show {
+            display: block;
+        }
+        
+        #drawCanvas {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            cursor: crosshair;
+            background: white;
+        }
+        
+        .canvas-buttons {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .canvas-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .canvas-btn.clear {
+            background: #f87171;
+            color: white;
+        }
+        
+        .canvas-btn.clear:hover {
+            background: #ef4444;
+        }
+        
+        .canvas-btn.predict {
+            background: #34d399;
+            color: white;
+        }
+        
+        .canvas-btn.predict:hover {
+            background: #10b981;
+        }
+        
+        .tab-switch {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f0f0f0;
+            color: #666;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #666;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔢 手写数字识别</h1>
+        
+        <div class="tab-switch">
+            <button class="tab-btn active" onclick="switchTab('upload')">上传图片</button>
+            <button class="tab-btn" onclick="switchTab('draw')">手写输入</button>
+        </div>
+        
+        <div id="uploadTab" class="upload-tab">
+            <div class="upload-section" onclick="document.getElementById('fileInput').click()" ondragover="event.preventDefault(); this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault(); this.classList.remove('dragover'); handleDrop(event)">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">点击或拖拽图片到此处</div>
+                <div class="upload-hint">支持 JPG、PNG、BMP 格式，建议使用白底黑字的数字图片</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+            
+            <div class="preview-section" id="previewSection">
+                <img id="previewImage" src="" alt="预览图片">
+            </div>
+            
+            <button class="predict-btn" id="predictBtn" onclick="predict()" disabled>开始识别</button>
+        </div>
+        
+        <div id="drawTab" class="canvas-section">
+            <canvas id="drawCanvas" width="280" height="280"></canvas>
+            <div class="canvas-buttons">
+                <button class="canvas-btn clear" onclick="clearCanvas()">清除</button>
+                <button class="canvas-btn predict" onclick="predictFromCanvas()">识别</button>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">正在识别...</div>
+        </div>
+        
+        <div class="result-section" id="resultSection">
+            <div class="result-title">识别结果</div>
+            <div class="prediction">
+                <div class="prediction-number" id="predictionNumber">0</div>
+                <div class="prediction-confidence" id="confidence">置信度: 0%</div>
+            </div>
+            <div class="probabilities" id="probabilities"></div>
+        </div>
+    </div>
+    
+    <script>
+        let currentTab = 'upload';
+        let selectedFile = null;
+        let canvas = null;
+        let ctx = null;
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.tab-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            if (tab === 'upload') {
+                document.getElementById('uploadTab').style.display = 'block';
+                document.getElementById('drawTab').style.display = 'none';
+            } else {
+                document.getElementById('uploadTab').style.display = 'none';
+                document.getElementById('drawTab').style.display = 'block';
+                initCanvas();
+            }
+            
+            document.getElementById('resultSection').classList.remove('show');
+        }
+        
+        function initCanvas() {
+            if (!canvas) {
+                canvas = document.getElementById('drawCanvas');
+                ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 15;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                let isDrawing = false;
+                
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseleave', stopDrawing);
+                
+                canvas.addEventListener('touchstart', startDrawing);
+                canvas.addEventListener('touchmove', draw);
+                canvas.addEventListener('touchend', stopDrawing);
+            }
+        }
+        
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        function clearCanvas() {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('resultSection').classList.remove('show');
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewSection').classList.add('show');
+                    document.getElementById('predictBtn').disabled = false;
+                    document.getElementById('resultSection').classList.remove('show');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function handleDrop(event) {
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewSection').classList.add('show');
+                    document.getElementById('predictBtn').disabled = false;
+                    document.getElementById('resultSection').classList.remove('show');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        async function predict() {
+            if (!selectedFile) return;
+            
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('resultSection').classList.remove('show');
+            
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                alert('识别失败: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+        
+        async function predictFromCanvas() {
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('resultSection').classList.remove('show');
+            
+            try {
+                const dataUrl = canvas.toDataURL('image/png');
+                const response = await fetch('/api/predict_base64', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ image: dataUrl })
+                });
+                
+                const result = await response.json();
+                displayResult(result);
+            } catch (error) {
+                alert('识别失败: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+        
+        function displayResult(result) {
+            if (result.error) {
+                alert('识别失败: ' + result.error);
+                return;
+            }
+            
+            document.getElementById('predictionNumber').textContent = result.prediction;
+            document.getElementById('confidence').textContent = `置信度: ${result.probabilities[result.prediction]}%`;
+            
+            const probabilitiesDiv = document.getElementById('probabilities');
+            probabilitiesDiv.innerHTML = '';
+            
+            for (let i = 0; i <= 9; i++) {
+                const prob = result.probabilities[i] || 0;
+                const item = document.createElement('div');
+                item.className = 'prob-item';
+                item.innerHTML = `
+                    <div class="prob-number">${i}</div>
+                    <div class="prob-bar-container">
+                        <div class="prob-bar" style="width: ${prob}%"></div>
+                    </div>
+                    <div class="prob-value">${prob}%</div>
+                `;
+                probabilitiesDiv.appendChild(item);
+            }
+            
+            document.getElementById('resultSection').classList.add('show');
+        }
+    </script>
+</body>
+</html>
