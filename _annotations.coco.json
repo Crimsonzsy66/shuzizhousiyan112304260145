@@ -1,0 +1,154 @@
+{
+  "info": {
+    "year": 2026,
+    "version": "1.0",
+    "description": "Annotations in COCO format, created by T-Rex Label",
+    "date_created": "2026-05-06T03:17:44.137Z"
+  },
+  "images": [
+    {
+      "id": 0,
+      "file_name": "c6cbf19c488647c2c995e0ba1cc65a41.jpg",
+      "width": 400,
+      "height": 266
+    },
+    {
+      "id": 1,
+      "file_name": "93fb7d0174b58eb163cbe19da3c78296.jpg",
+      "width": 550,
+      "height": 366
+    }
+  ],
+  "categories": [
+    {
+      "id": 0,
+      "name": "带安全帽的人"
+    },
+    {
+      "id": 1,
+      "name": "带头盔的摩托车"
+    },
+    {
+      "id": 2,
+      "name": "没带头盔的摩托车"
+    },
+    {
+      "id": 3,
+      "name": "没带安全帽的人"
+    }
+  ],
+  "annotations": [
+    {
+      "id": 0,
+      "image_id": 0,
+      "category_id": 0,
+      "area": 4029.60191,
+      "bbox": [
+        73.245168,
+        18.249237,
+        63.479145,
+        63.479145
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 1,
+      "image_id": 0,
+      "category_id": 0,
+      "area": 8333.4075,
+      "bbox": [
+        158.697864,
+        28.829095,
+        94.811801,
+        87.894201
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 2,
+      "image_id": 0,
+      "category_id": 1,
+      "area": 15659.414523,
+      "bbox": [
+        1.62767,
+        127.303154,
+        115.564598,
+        135.503561
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 3,
+      "image_id": 0,
+      "category_id": 1,
+      "area": 14436.260787,
+      "bbox": [
+        133.468973,
+        166.774161,
+        150.966429,
+        95.625636
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 4,
+      "image_id": 0,
+      "category_id": 2,
+      "area": 22036.305908,
+      "bbox": [
+        253.102747,
+        89.052899,
+        139.572737,
+        157.884028
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 5,
+      "image_id": 0,
+      "category_id": 3,
+      "area": 5102.241669,
+      "bbox": [
+        285.249237,
+        25.573754,
+        88.301119,
+        57.782299
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 6,
+      "image_id": 1,
+      "category_id": 0,
+      "area": 24368.072078,
+      "bbox": [
+        278.636826,
+        16.265514,
+        156.663276,
+        155.544252
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    },
+    {
+      "id": 7,
+      "image_id": 1,
+      "category_id": 3,
+      "area": 23385.084586,
+      "bbox": [
+        53.713123,
+        19.622584,
+        167.85351,
+        139.318413
+      ],
+      "segmentation": [],
+      "iscrowd": 0
+    }
+  ]
+}
