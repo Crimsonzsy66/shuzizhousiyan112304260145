@@ -4,7 +4,7 @@
 
 ## 在线访问
 
-**HuggingFace Spaces部署地址**: `https://chuxihappy-dukejin112304260147-02.hf.space`
+**HuggingFace Spaces部署地址**: `https://Crimsonzsy66-shuzizhousiyan112304260145.hf.space`
 
 ## 功能特性
 

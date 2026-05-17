@@ -1,3 +1,8 @@
+"""
+Kaggle数字识别竞赛 - Web识别系统 v2.0
+基于新训练的CNN模型
+"""
+
 from flask import Flask, request, render_template, jsonify
 import torch
 import torch.nn as nn
@@ -39,9 +44,11 @@ class CNN(nn.Module):
         x = self.fc2(x)
         return x
 
+print("加载模型...")
 model = CNN()
 model.load_state_dict(torch.load('mnist_cnn.pth'))
 model.eval()
+print("模型加载成功！")
 
 def preprocess_image(image):
     image = image.convert('L')
@@ -92,7 +99,7 @@ def preprocess_image(image):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index_new.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -135,4 +142,5 @@ def predict_base64():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    print("启动服务器: http://127.0.0.1:5001/")
+    app.run(host='127.0.0.1', port=5001, debug=False)
